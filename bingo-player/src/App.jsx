@@ -15,6 +15,7 @@ function App() {
   const [volume, setVolume] = useState(0.8);
   const [autoCut, setAutoCut] = useState(true);
   const [autoCutSeconds, setAutoCutSeconds] = useState(30);
+  const [audioOnly, setAudioOnly] = useState(false);
 
   /* =======================
      REFS
@@ -246,7 +247,7 @@ function App() {
             </button>
           </div>
           <div className="mb-3 text-center">
-            {hasVideo ? (
+            {(hasVideo && !audioOnly) ? (
               <video
                 ref={mediaRef}
                 src={currentSong.video}
@@ -285,7 +286,7 @@ function App() {
 
           {/* OPTIONS */}
           <div className="row align-items-center mb-4">
-            <div className="col-md-6">
+            <div className="col-md-4">
               <div className="form-check">
                 <input
                   className="form-check-input"
@@ -308,7 +309,7 @@ function App() {
                 /> segons
               </div>
             </div>
-            <div className="col-md-6">
+            <div className="col-md-4">
               <label className="form-label">
                 🔊 Volum: {Math.round(volume * 100)}%
               </label>
@@ -322,6 +323,18 @@ function App() {
                 onChange={(e) => setVolume(Number(e.target.value))}
               />
             </div>
+            <div className="col-md-4">
+              <input
+                className="form-check-input"
+                type="checkbox"
+                id="audioOnly"
+                checked={audioOnly}
+                onChange={(e) => setAudioOnly(e.target.checked)}
+              />
+              <label className="form-check-label fw-bold" htmlFor="audioOnly">
+                🎧 Només àudio
+              </label>
+            </div>            
           </div>
 
           {/* PLAYLIST */}
