@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import CsvLoader from "./CsvLoader";
-import logo from './assets/logo-light.png'
+import logoLight from './assets/logo-light.png'
+import logoDark from './assets/logo-dark.png'
 import "bootstrap/dist/css/bootstrap.min.css";
 
 function App() {
@@ -16,11 +17,13 @@ function App() {
   const [autoCut, setAutoCut] = useState(true);
   const [autoCutSeconds, setAutoCutSeconds] = useState(30);
   const [audioOnly, setAudioOnly] = useState(false);
+  const [fullScreenPlayer, setFullScreenPlayer] = useState(false);
 
   /* =======================
      REFS
   ======================= */
   const mediaRef = useRef(null);
+  const containerRef = useRef(null);
   const cutTimeoutRef = useRef(null);
 
   /* =======================
@@ -208,6 +211,42 @@ function App() {
   };
 
   /* =======================
+     FULLSCREEN
+  ======================= */
+  const togglePlayerFullScreen = () => {
+    if (!containerRef.current) return;
+    if (!document.fullscreenElement) {
+      containerRef.current.requestFullscreen();
+      setFullScreenPlayer(true);
+    } else {
+      document.exitFullscreen();
+      setFullScreenPlayer(false);
+    }
+  };
+
+  const handleFullScreenPlayer = () => {
+    if (!containerRef.current) return;
+    if (document.fullscreenElement) {
+      setFullScreenPlayer(true);
+    } else {
+      setFullScreenPlayer(false);
+    }
+  }
+
+  /* Maintain fullscreen on song change */
+  useEffect(() => {
+    const current = containerRef.current;
+    if (current) {
+      current.addEventListener('fullscreenchange', handleFullScreenPlayer);
+    }
+    return () => {
+      if (current) {
+        current.removeEventListener('fullscreenchange', handleFullScreenPlayer);
+      }
+    };
+  }, [currentIndex]);
+
+  /* =======================
      RENDER
   ======================= */
   
@@ -219,9 +258,32 @@ function App() {
   const remainingCount = totalSongs - playedCount;
 
   return (
-    <div className="container py-4">
-      <h2 className="mb-3 text-center"><img src={logo} width="32"/> Bingo Musical</h2>
-
+  <>
+    <header className="p-4 sticky-top bg-white">
+      <div className="d-flex justify-content-between align-items-center">
+        <div className="d-flex align-items-center gap-3">
+          <picture>
+            <source
+              srcSet={logoDark}
+              media="(prefers-color-scheme: dark)"
+            />
+            <img
+              src={logoLight}
+              alt="Bingo Musical"
+              width={48}
+              height={48}
+            />
+          </picture>
+          <h1 className="mb-0">Bingo Musical</h1>
+        </div>
+        <button 
+          className="btn btn-secondary" 
+          onClick={removeCurrentCsv}>
+          ⬆️ Pujar nou CSV
+        </button>
+      </div>
+    </header>
+    <div className="row mx-4">
       {/* CSV LOADER */}
       {(!songs.length || !csvValid) && (
         <CsvLoader checksumKey={CSV_CHECKSUM_KEY} onLoadCsv={loadCsvText} />
@@ -240,29 +302,25 @@ function App() {
 
       {/* PLAYER */}
       {songs.length && csvValid && (
-        <>
-          <div className="mb-3 text-center">
-            <button className="btn btn-secondary" onClick={removeCurrentCsv}>
-            Pujar nou CSV
-            </button>
-          </div>
-          <div className="mb-3 text-center">
-            {(hasVideo && !audioOnly) ? (
-              <video
-                ref={mediaRef}
-                src={currentSong.video}
-                width="100%"
-                controls={true}
-              />
-            ) : (
-              <audio
-                ref={mediaRef}
-                src={currentSong.audio}
-                controls={true}
-              />
-            )}
-          </div>
-
+      <>
+        <main id="player" ref={containerRef} 
+          className={`container pb-4 col-lg-6 ${fullScreenPlayer ? "text-white" : ""}`}>
+          {(hasVideo && !audioOnly) ? (
+            <video
+              ref={mediaRef}
+              src={currentSong.video}
+              width="100%"
+              className={fullScreenPlayer ? "h-75" : "h-50"}
+              controls={true}
+            />
+          ) : (
+            <audio
+              ref={mediaRef}
+              src={currentSong.audio}
+              controls={true}
+            />
+          )}
+          
           {/* SONG INFO */}
           <h4 className="my-4 text-center">
             {currentSong.num}. {currentSong.title} - <strong>{currentSong.artist.toUpperCase()}</strong> ({currentSong.year})
@@ -281,6 +339,9 @@ function App() {
             </button>
             <button className="btn btn-secondary" onClick={nextSong}>
               ⏭
+              </button>
+            <button className="btn btn-dark" onClick={togglePlayerFullScreen}>
+              📺
             </button>
           </div>
 
@@ -336,15 +397,17 @@ function App() {
               </label>
             </div>            
           </div>
+        </main>
 
-          {/* PLAYLIST */}
-          <ul className="list-group">
+        {/* PLAYLIST */}
+        <aside className="col-lg-6 vh-100">
+          <ul className="list-group h-75 overflow-auto">
             {songs.map((song, index) => (
               <li
                 key={index}
-                className={`list-group-item ${
-                  index === currentIndex ? "active" : ""
-                }`}
+                className={`list-group-item d-flex justify-content-between align-items-center
+                  ${index === currentIndex ? "active" : ""}
+                  ${playedSongs.has(index) ? "list-group-item-success opacity-75" : ""}`}
                 style={{ cursor: "pointer" }}
                 onClick={() => {
                   setCurrentIndex(index);
@@ -355,9 +418,11 @@ function App() {
               </li>
             ))}
           </ul>
-        </>
+        </aside>
+      </>
       )}
     </div>
+  </>
   );
 }
 
