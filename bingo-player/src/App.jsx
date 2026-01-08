@@ -211,6 +211,20 @@ function App() {
   };
 
   /* =======================
+     SHUFFLE
+  ======================= */
+  const shuffleSongs = () => {
+    const shuffled = [...songs];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    setSongs(shuffled);
+    setCurrentIndex(0);
+    setIsPlaying(false);
+  };
+  
+  /* =======================
      FULLSCREEN
   ======================= */
   const togglePlayerFullScreen = () => {
@@ -320,17 +334,22 @@ function App() {
               controls={true}
             />
           )}
-          
+
           {/* SONG INFO */}
+          {/* 
           <h4 className="my-4 text-center">
             {currentSong.num}. {currentSong.title} - <strong>{currentSong.artist.toUpperCase()}</strong> ({currentSong.year})
           </h4>
+          */}
           <h2 className="text-center my-4">
             <span className="fw-bold">⏳ {playedCount} / {totalSongs}</span> ({remainingCount} pendents)
           </h2>
           
           {/* CONTROLS */}
           <div className="d-flex justify-content-center gap-3 mb-4">
+            <button className="btn btn-warning" onClick={shuffleSongs}>
+              🔀
+            </button>
             <button className="btn btn-secondary" onClick={prevSong}>
               ⏮
             </button>
