@@ -14,6 +14,7 @@ function App() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.8);
   const [autoCut, setAutoCut] = useState(true);
+  const [autoCutSeconds, setAutoCutSeconds] = useState(30);
 
   /* =======================
      REFS
@@ -165,10 +166,9 @@ function App() {
   const handleAutoCut = () => {
     clearAutoCut();
     if (!autoCut) return;
-    const seconds = Math.floor(Math.random() * 15) + 15;
     cutTimeoutRef.current = setTimeout(() => {
       nextSong();
-    }, seconds * 1000);
+    }, autoCutSeconds * 1000);
   };
 
   const clearAutoCut = () => {
@@ -295,11 +295,19 @@ function App() {
                   id="autoCut"
                 />
                 <label className="form-check-label" htmlFor="autoCut">
-                  Tall automàtic (15-30 s)
+                  ✂️ 
                 </label>
+                <input
+                  type="number"
+                  min="5"
+                  max="90"
+                  step="5"
+                  value={autoCutSeconds}
+                  onChange={(e) => setAutoCutSeconds(Number(e.target.value))}
+                  id="autoCutSeconds"
+                /> segons
               </div>
             </div>
-
             <div className="col-md-6">
               <label className="form-label">
                 🔊 Volum: {Math.round(volume * 100)}%
