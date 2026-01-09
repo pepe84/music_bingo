@@ -191,9 +191,19 @@ function App() {
   };  
 
   /* =======================
+     START AT 
+  ======================= */
+
+  const handleLoadedMetadata = (e) => {
+    e.currentTarget.currentTime = currentSong.start || 0;
+  };
+  
+  /* =======================
      Controls
   ======================= */
-  const playPause = () => setIsPlaying((prev) => !prev);
+  const playPause = () => {
+    setIsPlaying((prev) => !prev);
+  };
 
   const nextSong = () => {
     clearAutoCut();
@@ -335,9 +345,7 @@ function App() {
               width="100%"
               className={fullScreenPlayer ? "h-75" : "h-50"}
               controls={true}
-              onLoadedMetadata={(e) => {
-                e.currentTarget.currentTime = currentSong.start;
-              }}
+              onLoadedMetadata={handleLoadedMetadata}
             />
           )}
           {(hasAudio && (!hasVideo || audioOnly)) && (
@@ -345,9 +353,7 @@ function App() {
               ref={mediaRef}
               src={currentSong.audio}
               controls={true}
-              onLoadedMetadata={(e) => {
-                e.currentTarget.currentTime = currentSong.start;
-              }}
+              onLoadedMetadata={handleLoadedMetadata}
             />
           )}
           {(!hasVideo && !hasAudio) && isPlaying && (
