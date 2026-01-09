@@ -38,12 +38,18 @@ function App() {
   const [csvErrors, setCsvErrors] = useState([]);
   const [csvValid, setCsvValid] = useState(true);
 
-  function normalizePublicPath(file, folder) {
+  const normalizePublicPath = (file, folder) => {
     if (!file) return null;
     // si ja és una URL absoluta, no la toquem
     if (file.startsWith("http")) return file;
     // assegurem ruta absoluta des de /public
     return `/${folder}/${file}`;
+  }
+
+  const normalizeStart = (value) => {
+    const n = Number(value);
+    if (Number.isNaN(n) || n < 0) return 0;
+    return Math.floor(n);
   }
 
   const getYouTubeEmbedUrl = (url, start = 0) => {
@@ -57,11 +63,12 @@ function App() {
     }
 
     if (!videoId) return null;
+    start = normalizeStart(start);
 
     return `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=0&start=${start}`;
   }
 
-  function validateAndNormalizeSongs(rows) {
+  const validateAndNormalizeSongs = (rows) => {
     const errors = [];
     const validSongs = [];
 
@@ -83,7 +90,7 @@ function App() {
       if (!mediaColumn) {
         errors.push(`Fila ${line}: falta columna multimedia (${MEDIA_COLUMNS.join()})`);
       }
-     
+      
       validSongs.push({
         num: row.Num.trim(),
         title: row.Title.trim(),
@@ -91,7 +98,8 @@ function App() {
         year: row.Year.trim(),
         audio: normalizePublicPath(row.Audio, "audio"),
         video: normalizePublicPath(row.Video, "video"),
-        youtube: getYouTubeEmbedUrl(row.YouTube) || null,
+        youtube: getYouTubeEmbedUrl(row.YouTube, row.Start) || null,
+        start: normalizeStart(row.Start),
       });
     });
 
@@ -136,7 +144,7 @@ function App() {
 
   // ---- UPLOAD NEW CSV ----
 
-  function removeCurrentCsv() {
+  const removeCurrentCsv = () => {
     resetCsv();
     localStorage.removeItem(CSV_STORAGE_KEY);
     localStorage.removeItem(CSV_CHECKSUM_KEY);
@@ -266,7 +274,8 @@ function App() {
   
   const currentSong = songs[currentIndex];
   const hasVideo = currentSong?.video && currentSong?.video.trim() !== "";
-
+  const hasAudio = currentSong?.audio && currentSong?.audio.trim() !== "";
+  
   const totalSongs = songs.length;
   const playedCount = playedSongs.size;
   const remainingCount = totalSongs - playedCount;
@@ -319,19 +328,37 @@ function App() {
       <>
         <main id="player" ref={containerRef} 
           className={`container pb-4 col-lg-6 ${fullScreenPlayer ? "text-white" : ""}`}>
-          {(hasVideo && !audioOnly) ? (
+          {(hasVideo && !audioOnly) && (
             <video
               ref={mediaRef}
               src={currentSong.video}
               width="100%"
               className={fullScreenPlayer ? "h-75" : "h-50"}
               controls={true}
+              onLoadedMetadata={(e) => {
+                e.currentTarget.currentTime = currentSong.start;
+              }}
             />
-          ) : (
+          )}
+          {(hasAudio && (!hasVideo || audioOnly)) && (
             <audio
               ref={mediaRef}
               src={currentSong.audio}
               controls={true}
+              onLoadedMetadata={(e) => {
+                e.currentTarget.currentTime = currentSong.start;
+              }}
+            />
+          )}
+          {(!hasVideo && !hasAudio) && isPlaying && (
+            <iframe
+              key={currentIndex} // 🔥 força reload
+              src={currentSong.youtube}
+              width="100%"
+              className={fullScreenPlayer ? "h-75" : "h-50"}
+              title="YouTube player"
+              allow="autoplay; encrypted-media"
+              allowFullScreen
             />
           )}
 
