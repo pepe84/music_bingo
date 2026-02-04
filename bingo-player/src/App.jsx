@@ -4,6 +4,8 @@ import UnifiedPlayer from "./components/UnifiedPlayer";
 import logoLight from './assets/logo-light.png'
 import logoDark from './assets/logo-dark.png'
 import "bootstrap/dist/css/bootstrap.min.css";
+import { useI18n } from "./i18n/I18nContext"
+import I18nLanguageSelector from "./i18n/I18nLanguageSelector"
 
 function App() {
   /* =======================
@@ -117,159 +119,183 @@ function App() {
   const totalSongs = songs.length;
   const playedCount = playedSongs.size;
   const remainingCount = totalSongs - playedCount;
-  
+
+  const { t, loading } = useI18n();
+
   return (
-  <BingoCsvLoader songs={songs} resetSongs={resetSongs}>
-    <header className="p-4 sticky-top bg-white">
-      <div className="d-flex justify-content-between align-items-center">
-        <div className="d-flex align-items-center gap-3">
-          <picture>
-            <source
-              srcSet={logoDark}
-              media="(prefers-color-scheme: dark)"
-            />
-            <img
-              src={logoLight}
-              alt="Bingo Musical"
-              width={48}
-              height={48}
-            />
-          </picture>
-          <h1 className="mb-0">Bingo Musical</h1>
-        </div>
-        {/* CSV CLEAR BUTTON */}
-        <BingoCsvLoader.ClearButton />
-      </div>
-    </header>
-    <div className="row mx-4">
-      {/* CSV LOADER */}
-      <BingoCsvLoader.Loader />
-
-      {/* PLAYER */}
-      {songs.length && (
-      <>
-        <main id="player" ref={containerRef} 
-          className={`container pb-4 col-lg-6 ${fullScreenPlayer ? "text-white" : ""}`}>
-          
-          <UnifiedPlayer
-            song={currentSong}
-            playing={isPlaying}
-            volume={volume}
-            audioOnly={audioOnly}
-            className={fullScreenPlayer ? "h-75" : "h-50"}
-            autoCutEnabled={autoCut}
-            autoCutSeconds={autoCutSeconds}
-            onPlay={() => setIsPlaying(true)}
-            onEnded={nextSong}
-          />
-
-          {/* SONG INFO */}
-          {/* 
-          <h4 className="my-4 text-center">
-            {currentSong.num}. {currentSong.title} - <strong>{currentSong.artist.toUpperCase()}</strong> ({currentSong.year})
-          </h4>
-          */}
-          <h2 className="text-center my-4">
-            <span className="fw-bold">⏳ {playedCount} / {totalSongs}</span> ({remainingCount} pendents)
-          </h2>
-          
-          {/* CONTROLS */}
-          <div className="d-flex justify-content-center gap-3 mb-4">
-            <button className="btn btn-warning" onClick={shuffleSongs}>
-              🔀
-            </button>
-            <button className="btn btn-secondary" onClick={prevSong}>
-              ⏮
-            </button>
-            <button className="btn btn-primary" onClick={playPause}>
-              {isPlaying ? "⏸ Pause" : "▶️ Play"}
-            </button>
-            <button className="btn btn-secondary" onClick={nextSong}>
-              ⏭
-              </button>
-            <button className="btn btn-dark" onClick={togglePlayerFullScreen}>
-              📺
-            </button>
+    <>
+    {loading 
+    ? <div className="text-center mt-5">🌍 Loading language...</div>
+    : <BingoCsvLoader songs={songs} resetSongs={resetSongs}>
+      <header className="p-4 sticky-top bg-white">
+        <div className="d-flex justify-content-between align-items-center">
+          {/* LEFT */}
+          <div className="d-flex align-items-center gap-3">
+            <picture title={t("title")  }>
+              <source
+                srcSet={logoDark}
+                media="(prefers-color-scheme: dark)"
+              />
+              <img
+                src={logoLight}
+                alt="Bingo Musical"
+                width={48}
+                height={48}
+              />
+            </picture>
+            <h1 className="mb-0">{t("title")}</h1>
           </div>
 
-          {/* OPTIONS */}
-          <div className="row align-items-center mb-4">
-            <div className="col-md-4">
-              <div className="form-check">
+          {/* RIGHT */}
+          <div className="d-flex align-items-center gap-3">
+            <div>
+              <div className="input-group">
+                <span className="input-group-text">💬</span>
+                <I18nLanguageSelector/>
+              </div>
+            </div>
+            <BingoCsvLoader.ClearButton>
+              ⬆️ {t("csvUpload")}
+            </BingoCsvLoader.ClearButton>
+          </div>
+        </div>
+      </header>
+      <div className="row mx-4">
+        {/* CSV LOADER */}
+        <BingoCsvLoader.Loader 
+          title={t("csvTitle")}
+          buttonText={t("csvLoad")}
+          warningMessage={t("csvWarning")}
+        />
+
+        {/* PLAYER */}
+        {songs.length && (
+        <>
+          <main id="player" ref={containerRef} 
+            className={`container pb-4 col-lg-6 ${fullScreenPlayer ? "text-white" : ""}`}>
+            
+            <UnifiedPlayer
+              song={currentSong}
+              playing={isPlaying}
+              volume={volume}
+              audioOnly={audioOnly}
+              className={fullScreenPlayer ? "h-75" : "h-50"}
+              autoCutEnabled={autoCut}
+              autoCutSeconds={autoCutSeconds}
+              onPlay={() => setIsPlaying(true)}
+              onEnded={nextSong}
+            />
+
+            {/* SONG INFO */}
+            {/* 
+            <h4 className="my-4 text-center">
+              {currentSong.num}. {currentSong.title} - <strong>{currentSong.artist.toUpperCase()}</strong> ({currentSong.year})
+            </h4>
+            */}
+            <h2 className="text-center my-4">
+              <span className="fw-bold">⏳ {playedCount} / {totalSongs}</span> ({t("remaining",{"count":remainingCount})})
+            </h2>
+            
+            {/* CONTROLS */}
+            <div className="d-flex justify-content-center gap-3 mb-4">
+              <button className="btn btn-warning" onClick={shuffleSongs} title={t("shuffle")}>
+                🔀
+              </button>
+              <button className="btn btn-secondary" onClick={prevSong} title={t("prev")}>
+                ⏮
+              </button>
+              <button className={isPlaying ? "btn btn-primary" : "btn btn-success"} onClick={playPause} title={isPlaying ? t("pause") : t("play")}>
+                {isPlaying ? "⏸" : "▶️"}
+              </button>
+              <button className="btn btn-secondary" onClick={nextSong} title={t("next")}>
+                ⏭
+                </button>
+              <button className="btn btn-dark" onClick={togglePlayerFullScreen} title={t("shuffle")}>
+                📺
+              </button>
+            </div>
+
+            {/* OPTIONS */}
+            <div className="row align-items-center mb-4">
+              <div className="col-md-4">
+                <div className="form-check">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    checked={autoCut}
+                    onChange={(e) => setAutoCut(e.target.checked)}
+                    id="autoCut"
+                  />
+                  <label className="form-check-label" htmlFor="autoCut" title={t("autoCut")}>
+                    ✂️ 
+                  </label>
+                  <input
+                    type="number"
+                    min="5"
+                    max="90"
+                    step="5"
+                    value={autoCutSeconds}
+                    onChange={(e) => setAutoCutSeconds(Number(e.target.value))}
+                    id="autoCutSeconds"
+                  /> {t("seconds")}
+                </div>
+              </div>
+              <div className="col-md-4">
+                <label className="form-label" htmlFor="volume" title={t("volume")}>
+                  🔊 {t("volume")}: {Math.round(volume * 100)}%
+                </label>
+                <input
+                  type="range"
+                  className="form-range"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={volume}
+                  onChange={(e) => setVolume(Number(e.target.value))}
+                  id="volume"
+                />
+              </div>
+              <div className="col-md-4">
                 <input
                   className="form-check-input"
                   type="checkbox"
-                  checked={autoCut}
-                  onChange={(e) => setAutoCut(e.target.checked)}
-                  id="autoCut"
+                  id="audioOnly"
+                  checked={audioOnly}
+                  onChange={(e) => setAudioOnly(e.target.checked)}
                 />
-                <label className="form-check-label" htmlFor="autoCut">
-                  ✂️ 
+                <label className="form-check-label fw-bold" htmlFor="audioOnly" title={t("audioOnly")}>
+                  🎧 {t("audioOnly")}
                 </label>
-                <input
-                  type="number"
-                  min="5"
-                  max="90"
-                  step="5"
-                  value={autoCutSeconds}
-                  onChange={(e) => setAutoCutSeconds(Number(e.target.value))}
-                  id="autoCutSeconds"
-                /> segons
-              </div>
+              </div>            
             </div>
-            <div className="col-md-4">
-              <label className="form-label">
-                🔊 Volum: {Math.round(volume * 100)}%
-              </label>
-              <input
-                type="range"
-                className="form-range"
-                min="0"
-                max="1"
-                step="0.01"
-                value={volume}
-                onChange={(e) => setVolume(Number(e.target.value))}
-              />
-            </div>
-            <div className="col-md-4">
-              <input
-                className="form-check-input"
-                type="checkbox"
-                id="audioOnly"
-                checked={audioOnly}
-                onChange={(e) => setAudioOnly(e.target.checked)}
-              />
-              <label className="form-check-label fw-bold" htmlFor="audioOnly">
-                🎧 Només àudio
-              </label>
-            </div>            
-          </div>
-        </main>
+          </main>
 
-        {/* PLAYLIST */}
-        <aside className="col-lg-6 vh-100">
-          <ul className="list-group h-75 overflow-auto">
-            {songs.map((song, index) => (
-              <li
-                key={index}
-                className={`list-group-item d-flex justify-content-between align-items-center
-                  ${index === currentIndex ? "active" : ""}
-                  ${playedSongs.has(index) ? "list-group-item-success opacity-75" : ""}`}
-                style={{ cursor: "pointer" }}
-                onClick={() => {
-                  setCurrentIndex(index);
-                  setIsPlaying(true);
-                }}
-              >
-                {song.num}. {song.title} - {song.artist} ({song.year})
-              </li>
-            ))}
-          </ul>
-        </aside>
-      </>
-      )}
-    </div>
-  </BingoCsvLoader>
+          {/* PLAYLIST */}
+          <aside className="col-lg-6 vh-100">
+            <ul className="list-group h-75 overflow-auto">
+              {songs.map((song, index) => (
+                <li
+                  key={index}
+                  className={`list-group-item d-flex justify-content-between align-items-center
+                    ${index === currentIndex ? "active" : ""}
+                    ${playedSongs.has(index) ? "list-group-item-success opacity-75" : ""}`}
+                  style={{ cursor: "pointer" }}
+                  onClick={() => {
+                    setCurrentIndex(index);
+                    setIsPlaying(true);
+                  }}
+                >
+                  {song.num}. {song.title} - {song.artist} ({song.year})
+                </li>
+              ))}
+            </ul>
+          </aside>
+        </>
+        )}
+      </div>
+    </BingoCsvLoader>
+    }
+    </>
   );
 }
 

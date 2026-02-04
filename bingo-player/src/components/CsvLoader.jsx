@@ -1,7 +1,13 @@
 import Papa from "papaparse";
 import { useState } from "react";
 
-function CsvLoader({ checksumKey, onLoadCsv }) {
+function CsvLoader({ 
+  checksumKey, 
+  onLoadCsv,
+  title = "Upload CSV",
+  buttonText = "Load file",
+  warningMsg = "Same CSV file"
+}) {
   const [data, setData] = useState([]);
   const [preview, setPreview] = useState([]);
   const [fileText, setFileText] = useState(null);
@@ -46,7 +52,7 @@ function CsvLoader({ checksumKey, onLoadCsv }) {
 
   return (
     <div className="container mt-5">
-      <h2>📂 Carregar CSV</h2>
+      <h2>📂 {title}</h2>
 
       <input
         type="file"
@@ -81,7 +87,7 @@ function CsvLoader({ checksumKey, onLoadCsv }) {
 
           {sameAsStored && (
             <div className="alert alert-warning">
-              ⚠️ Aquest CSV és el mateix que l’últim carregat
+              ⚠️ {warningMsg}
             </div>
           )}
 
@@ -89,7 +95,7 @@ function CsvLoader({ checksumKey, onLoadCsv }) {
             className="btn btn-primary"
             onClick={confirmLoad}
           >
-            ▶️ Carregar CSV
+            ▶️ {buttonText}
           </button>
         </>
       )}

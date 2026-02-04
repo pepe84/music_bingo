@@ -61,7 +61,7 @@ function BingoCsvLoader({ children, resetSongs }) {
 
       for (const col of REQUIRED_COLUMNS) {
         if (!row[col] || !row[col].toString().trim()) {
-          errors.push(`Fila ${line}: falta la columna '${col}'`);
+          errors.push(`Row ${line}: missing column '${col}'`);
         }
       }
 
@@ -72,7 +72,7 @@ function BingoCsvLoader({ children, resetSongs }) {
         }
       }
       if (!mediaColumn) {
-        errors.push(`Fila ${line}: falta columna multimedia (${MEDIA_COLUMNS.join()})`);
+        errors.push(`Row ${line}: missing multimedia column (${MEDIA_COLUMNS.join()})`);
       }
       
       validSongs.push({
@@ -145,7 +145,7 @@ function BingoCsvLoader({ children, resetSongs }) {
   );
 }
 
-BingoCsvLoader.Loader = function Loader() {
+BingoCsvLoader.Loader = function Loader({title, buttonText, warningMsg}) {
 
   const { csvErrors, csvValid, loadCsvText, CSV_CHECKSUM_KEY } = useCsvContext();
 
@@ -155,7 +155,10 @@ BingoCsvLoader.Loader = function Loader() {
       {!csvValid && (
         <CsvLoader 
           checksumKey={CSV_CHECKSUM_KEY} 
-          onLoadCsv={loadCsvText} 
+          onLoadCsv={loadCsvText}
+          title={title}
+          buttonText={buttonText}
+          warningMsg={warningMsg}
         />
       )}
 
@@ -174,7 +177,7 @@ BingoCsvLoader.Loader = function Loader() {
 
 BingoCsvLoader.ClearButton = function ClearButton({
   className = "btn btn-secondary",
-  children = "⬆️ Pujar nou CSV",
+  children = "⬆️ Upload CSV",
 }) {
   const { removeCurrentCsv } = useCsvContext();
 
