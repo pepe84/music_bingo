@@ -1,0 +1,17 @@
+{
+  "title" : "Music Bingo",
+  "play" : "Play",
+  "pause" : "Pause",
+  "next" : "Next",
+  "prev" : "Previous",
+  "shuffle" : "Shuffle",
+  "volume" : "Volume",
+  "audioOnly" : "Audio only",
+  "autoCut" : "Auto cut",
+  "seconds" : "seconds",
+  "remaining" : "{{count}} remaining",
+  "csvTitle" : "Upload CSV",
+  "csvLoad" : "Load CSV",
+  "csvWarning" : "This CSV is the same as the last one loaded",
+  "csvUpload" : "Upload new CSV"
+}

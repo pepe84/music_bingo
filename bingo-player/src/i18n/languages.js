@@ -13,4 +13,6 @@ export const LANGUAGES = [
   { code: "ar", label: "العربية", dir: "rtl" },
 ];
 
+export const SUPPORTED_LANGS = LANGUAGES.map(l => l.code);
+
 export const FALLBACK_LANG = "ca";

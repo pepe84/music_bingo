@@ -4,7 +4,8 @@ import UnifiedPlayer from "./components/UnifiedPlayer";
 import logoLight from './assets/logo-light.png'
 import logoDark from './assets/logo-dark.png'
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useI18n } from "./i18n/I18nContext"
+
+import { useTranslation } from "react-i18next";
 import I18nLanguageSelector from "./i18n/I18nLanguageSelector"
 
 function App() {
@@ -120,11 +121,11 @@ function App() {
   const playedCount = playedSongs.size;
   const remainingCount = totalSongs - playedCount;
 
-  const { t, loading } = useI18n();
+  const { t, ready } = useTranslation();
 
   return (
     <>
-    {loading 
+    {!ready 
     ? <div className="text-center mt-5">🌍 Loading language...</div>
     : <BingoCsvLoader songs={songs} resetSongs={resetSongs}>
       <header className="p-4 sticky-top bg-white">
@@ -143,7 +144,7 @@ function App() {
                 height={48}
               />
             </picture>
-            <h1 className="mb-0">{t("title")}</h1>
+            <h1 className="mb-0 d-none d-md-block">{t("title")}</h1>
           </div>
 
           {/* RIGHT */}

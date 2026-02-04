@@ -1,0 +1,17 @@
+{
+  "title" : "Bingo Musical",
+  "play" : "Reproduir",
+  "pause" : "Pausa",
+  "next" : "Següent",
+  "prev" : "Anterior",
+  "shuffle" : "Barrejar",
+  "volume" : "Volum",
+  "audioOnly" : "Només àudio",
+  "autoCut" : "Tall automàtic",
+  "seconds" : "segons",
+  "remaining" : "{{count}} pendents",
+  "csvTitle" : "Pujar CSV",
+  "csvLoad" : "Carregar CSV",
+  "csvWarning" : "Aquest CSV és el mateix que l'últim carregat",
+  "csvUpload" : "Pujar nou CSV"
+}
