@@ -36,7 +36,7 @@ function BingoCsvLoader({ children, resetSongs }) {
     return Math.floor(n);
   }
 
-  const getYouTubeEmbedUrl = (url, start = 0) => {
+  const getYouTubeEmbedUrl = (url) => {
     if (!url) return null;
 
     let videoId = null;
@@ -47,9 +47,8 @@ function BingoCsvLoader({ children, resetSongs }) {
     }
 
     if (!videoId) return null;
-    start = normalizeStart(start);
 
-    return `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=0&start=${start}`;
+    return `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=0`;
   }
 
   const validateAndNormalizeSongs = (rows) => {
@@ -82,7 +81,7 @@ function BingoCsvLoader({ children, resetSongs }) {
         year: row.Year.trim(),
         audio: normalizePublicPath(row.Audio, "audio"),
         video: normalizePublicPath(row.Video, "video"),
-        youtube: getYouTubeEmbedUrl(row.YouTube, row.Start) || null,
+        youtube: getYouTubeEmbedUrl(row.YouTube),
         start: normalizeStart(row.Start),
       });
     });

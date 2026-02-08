@@ -6,6 +6,8 @@ export default function UnifiedPlayer({
   volume = 1,
   audioOnly = false,
   className = "",
+  defaultStartEnabled = false,
+  defaultStartSeconds = 0,  
   autoCutEnabled = false,
   autoCutSeconds = 0,
   onPlay,
@@ -31,7 +33,7 @@ export default function UnifiedPlayer({
     : hasYoutube && playing
     ? "youtube"
     : null;
-    
+
   /* ============================
      AUTO CUT
   ============================ */
@@ -69,8 +71,24 @@ export default function UnifiedPlayer({
      START AT 
   ======================= */
 
+  const getStartTime = () => {
+    return typeof song.start === "number" && song.start > 0
+      ? song.start
+      : defaultStartEnabled
+      ? defaultStartSeconds
+      : 0;
+  };
+
   const handleLoadedMetadata = (e) => {
-    e.currentTarget.currentTime = song.start || 0;
+    const startTime = getStartTime();
+    if (startTime > 0) {
+      e.currentTarget.currentTime = startTime;
+    }
+  };
+
+  const getYouTubeUrlWithStartTime = () => {
+    const startTime = getStartTime();
+    return `${song.youtube}&start=${startTime}`;
   };
 
   /* ============================
@@ -111,7 +129,7 @@ export default function UnifiedPlayer({
     return (
       <iframe
         key={`${song.youtube}-${song.start}-${playing}`}
-        src={song.youtube}
+        src={getYouTubeUrlWithStartTime()}
         width="100%"
         className={className}
         title="YouTube player"

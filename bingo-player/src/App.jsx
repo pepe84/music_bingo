@@ -17,6 +17,8 @@ function App() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.8);
+  const [defaultStartEnabled, setDefaultStartEnabled] = useState(false);
+  const [defaultStartSeconds, setDefaultStartSeconds] = useState(60);
   const [autoCut, setAutoCut] = useState(true);
   const [autoCutSeconds, setAutoCutSeconds] = useState(30);
   const [audioOnly, setAudioOnly] = useState(false);
@@ -181,6 +183,8 @@ function App() {
               volume={volume}
               audioOnly={audioOnly}
               className={fullScreenPlayer ? "h-75" : "h-50"}
+              defaultStartEnabled={defaultStartEnabled}
+              defaultStartSeconds={defaultStartSeconds}              
               autoCutEnabled={autoCut}
               autoCutSeconds={autoCutSeconds}
               onPlay={() => setIsPlaying(true)}
@@ -218,6 +222,33 @@ function App() {
 
             {/* OPTIONS */}
             <div className="row align-items-center mb-4">
+              <div className="col-md-4">
+                <div className="form-check">
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    checked={defaultStartEnabled}
+                    onChange={(e) => setDefaultStartEnabled(e.target.checked)}
+                    id="defaultStart"
+                  />
+                  <label
+                    className="form-check-label"
+                    htmlFor="defaultStart"
+                    title={t("defaultStart")}
+                  >
+                    ⏱️
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="120"
+                    step="1"
+                    value={defaultStartSeconds}
+                    onChange={(e) => setDefaultStartSeconds(Number(e.target.value))}
+                    id="defaultStartSeconds"
+                  /> {t("seconds")}
+                </div>
+              </div>              
               <div className="col-md-4">
                 <div className="form-check">
                   <input
